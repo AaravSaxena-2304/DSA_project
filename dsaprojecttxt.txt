@@ -1,0 +1,145 @@
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <cstring>
+
+using namespace std;
+
+class Node {
+public:
+    char data;
+    Node* next;
+    Node(char ele) {
+        data = ele;
+        next = NULL;
+    }
+};
+
+class Protected {
+public:
+    Node* head;
+    Protected() {
+        head = NULL;
+    }
+
+    void user_enter(char ele) {
+        Node* newNode = new Node(ele);
+        if (head == NULL) {
+            head = newNode;
+        }
+        else {
+            Node* temp = head;
+            while (temp->next != NULL)
+                temp = temp->next;
+            temp->next = newNode;
+        }
+    }
+
+     string gen_pwd() {
+        time_t now = time(0);
+        tm* lmt = localtime(&now);
+        string mth = to_string(1 + lmt->tm_mon);
+        string day = to_string(lmt->tm_mday);
+        string hr = to_string(5 + lmt->tm_hour);
+        string min = to_string(30 + lmt->tm_min);
+        string sec = to_string(lmt->tm_sec);
+
+        string pswd = hr + mth + min + day + sec;
+
+        return pswd;
+    }
+
+    void sleep(float seconds) {
+        clock_t startClock = clock();
+        float secondsAhead = seconds * CLOCKS_PER_SEC;
+        while (clock() < startClock + secondsAhead);
+    }
+
+    void chk_pwd(const string& use_pwd) {
+        string pword = gen_pwd();
+        if (use_pwd == pword) {
+            cout << "Access Granted... file content displayed in 5sec" << endl;
+            for (int i = 0; i < 5; i++) {
+                cout << ".";
+                sleep(1.0);
+            }
+            display();
+        }
+        else {
+            cout << "Wrong password, alert sent on mail account!" << endl;
+            cout << "Try again" << endl;
+        }
+    }
+
+    void display() {
+        Node* tmp = head;
+        while (tmp != NULL) {
+            cout << tmp->data;
+            tmp = tmp->next;
+        }
+        cout << "\nThank you for using Secure Ledger" << endl;
+    }
+};
+
+int main() {
+    Protected P;
+    string gmail, fname,pword,txt,chk_f,use_pwd;
+    int ch;
+    char* arrfname = new char[fname.length() + 1];
+    char* arrtxt = new char[txt.length() + 1];
+    cout << "This is SecureLedger, a dynamically password-protected file system" << endl;
+    cout << "It is based on the concept of a singly linked list" << endl;
+    cout << "To use SecureLedger, please enter your Gmail account name" << endl;
+    cin >> gmail;
+    P.sleep(1.0);
+    cout << "GMAIL VERIFIED" << endl;
+    P.sleep(1.0);
+    cout << "Enter 1 to create a new file" << endl;
+    cout << "Enter 2 to access a file" << endl;
+    cout << "Enter 3 to Exit" << endl;
+    cin >> ch;
+    switch (ch) {
+    case 1:
+        cout << "To create a new file, enter the file name and text" << endl;
+        cin >> fname;
+        cin >> txt;
+        strcpy(arrfname, fname.c_str());
+        strcpy(arrtxt, txt.c_str());
+        for (int i = 0; i < txt.length(); i++) {
+            P.user_enter(arrtxt[i]);
+        }
+        cout << "File Saved" << endl;
+        break;
+
+    case 2:
+        cout << "To access your file, enter your file name." << endl;
+        cin >> chk_f;
+        bool fileFound = false;
+        for (const string &arrvar : arrfname ) {/*int i = 0; i < strlen(arrfname); i++) */
+            if (chk_f == string(1, arrfname[i])) {
+                    string pword = P.gen_pwd();
+                    fileFound = true;
+                    break;
+                }
+            else {
+                cout << "Wrong file name" << endl;
+                break;
+            }
+        }
+        cout << "This is your Gmail account... the password is: " << pword << endl;
+        cout << "Enter the password sent in the mail correctly" << endl;
+        cin >> pword;
+        P.chk_pwd(pword);
+        break;
+
+    case 3:
+        cout << "Thank you for using SecureLedger" << endl;
+        break;
+
+    default:
+        cout << "Wrong option selected" << endl;
+        break;
+    }
+
+    return 0;
+}
